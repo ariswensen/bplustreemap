@@ -118,7 +118,8 @@ public class BPlusTreeMap<K, V> implements Map<K, V> {
      * <p>More formally, if this map contains a mapping from a key
      * {@code k} to a value {@code v} such that {code key} compares
      * equal to {@code k} according to the mapping, then this method
-     * will return {@code v}.
+     * will return {@code v}. If this key mapping does not contain
+     * a value or is null, it will return {@code null}.
      * (There can be at most one such mapping.)
      *
      * @param key the key for which to retrieve the value
@@ -131,7 +132,9 @@ public class BPlusTreeMap<K, V> implements Map<K, V> {
     @Override
     public V get(Object key) {
         Node curr = searchForLeaf((K)key);
-        return curr.values.get(curr.keys.indexOf((K)key));
+        int i = curr.keys.indexOf((K) key);
+        if(i == -1) return null;
+        else return curr.values.get(i);
     }
 
     /**
