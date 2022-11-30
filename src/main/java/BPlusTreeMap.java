@@ -284,21 +284,34 @@ public class BPlusTreeMap<K, V> implements Map<K, V> {
         Node left = new Node(), right = new Node(), parent = new Node();
 
         left.keys.addAll(n.keys.subList(0, h));
-        left.values.addAll(n.values.subList(0, h));
         left.setNext(right);
         left.setParent(parent);
 
         right.keys.addAll(n.keys.subList(h, n.keys.size()));
-        right.values.addAll(n.values.subList(h, n.values.size()));
         right.setNext(n.next);
         right.setParent(parent);
+
+        if(n.isLeaf){
+            left.values.addAll(n.values.subList(0, h));
+            right.values.addAll(n.values.subList(h, n.values.size()));
+        } else {
+            left.setLeaf(false);
+            right.setLeaf(false);
+            left.children.addAll(n.children.subList(0, h));
+            right.children.addAll(n.children.subList(h, n.children.size()));
+        }
 
         if(n.parent != null) {
             parent = n.parent;
             parent.setLeaf(false);
             int i = parent.children.indexOf(n);
-            parent.children.set(i, left);
-            parent.children.add(i + 1, right);
+            if(i == -1) {
+                parent.children.add(left);
+                parent.children.add(right);
+            } else {
+                parent.children.set(i, left);
+                parent.children.add(i + 1, right);
+            }
             parent.addKey(n.keys.get(h));
             if(parent.keys.size() >= tree.order) split(parent);
         } else {
